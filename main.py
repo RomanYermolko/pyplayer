@@ -73,6 +73,8 @@ def process_playlist():
             i += 1;
             continue;
 
+        dbg('Playing : ' + music_list[i]['artist'] + '-' +
+                                        music_list[i]['title']);
         media.get_mrl();
         player.set_media(media);
 
@@ -93,6 +95,9 @@ def process_playlist():
                         music_list[i]['title'] + '.mp3');
                 player_state = 'Active';
             elif player_state == 'Next':
+                break;
+            elif player_state == 'Prev':
+                i -= 2;
                 break;
             continue;
         i += 1;
@@ -157,6 +162,10 @@ def pnext():
     global player_state;
     player_state = 'Next';
 
+def pprev():
+    global player_state;
+    player_state = 'Prev';
+
 def download():
     global player_state;
     player_state = 'Download';
@@ -184,12 +193,14 @@ search_entry.pack(side=LEFT);
 
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
 stop_button = Button(appWin, command=stop, text='Stop'); 
-next_button = Button(appWin, command=pnext, text='Next'); 
+next_button = Button(appWin, command=pnext, text='Next');
+prev_button = Button(appWin, command=pprev, text='Prev'); 
 download_button = Button(appWin, command=download, text='Download'); 
 
 start_button.pack();
 stop_button.pack();
 next_button.pack();
+prev_button.pack();
 download_button.pack();
 appWin.mainloop();
 
