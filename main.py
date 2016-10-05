@@ -141,7 +141,7 @@ def play_selected(event):
     global PlayListBox;
     global curplay_idx;
     set_player_state('Changed');
-    dbg('Key pressed');
+    time.sleep(0.5);
     curplay_idx = PlayListBox.curselection()[0] - 1;
     set_player_state('Active');
     return;
@@ -185,7 +185,7 @@ def vk_music_main(a=None):
         yscroll = Scrollbar(command=PlayListBox.yview, orient=VERTICAL);
         yscroll.grid(row = 5, column = 2);
         PlayListBox.configure(yscrollcommand=yscroll.set);
-        PlayListBox.bind('<ButtonRelease-1>', play_selected);
+        PlayListBox.bind('<Double-Button-1>', play_selected);
     PlayListBox.delete(0, PlayListBox.size());
 
     music_list = music_response[1:];
