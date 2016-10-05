@@ -188,20 +188,16 @@ def vk_music_main(a=None):
 
 
 def stop():
-    global player_state;
-    player_state = 'Stop';
+    set_player_state('Stop');
 
 def pnext():
-    global player_state;
-    player_state = 'Next';
+    set_player_state('Next');
 
 def pprev():
-    global player_state;
-    player_state = 'Prev';
+    set_player_state('Prev');
 
 def download():
-    global player_state;
-    player_state = 'Download';
+    set_player_state('Download');
 
 
 wrap_around = Checkbutton(appWin, text='Repeat current', variable=repeat_current,
