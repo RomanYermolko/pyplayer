@@ -54,10 +54,6 @@ def play_song(song_data, player, vlc_inst):
         dbg('Exception : ', e);
         return -1;
 
-# debug template and reserve for future 
-#    dbg('Playing : ' + song_data['artist'] + '-' +
-#        song_data['duration'] + '   ' + str(song_data['duration'] / 60));
-
     media.get_mrl();
     player.set_media(media);
 
@@ -216,13 +212,21 @@ def pprev():
 def download():
     set_player_state('Download');
 
+###############################################################################
+############ UI related data #########################
+###############################################################################
+bg_pic = PhotoImage(file='pictures/music_wall_gif.gif');
+bg_label = Label(appWin, image=bg_pic);
+bg_label.place(x=0, y=0, relwidth=1, relheight=1);
 
-wrap_around = Checkbutton(appWin, text='Repeat current', variable=repeat_current,
-                            onvalue=1, offvalue=0);
+wrap_around = Checkbutton(appWin, text='Repeat current', 
+                          variable=repeat_current,
+                          onvalue=1, offvalue=0);
 wrap_around.grid(row=4, column=1);
 
-owner_compositions = Checkbutton(appWin, text='Owner compositions', variable=owner_comp_list,
-                            onvalue=1, offvalue=0);
+owner_compositions = Checkbutton(appWin, text='Owner compositions',
+                                 variable=owner_comp_list,
+                                 onvalue=1, offvalue=0);
 owner_compositions.grid(row=4, column=2);
 
 #login
@@ -238,8 +242,9 @@ pwd_entry = Entry(appWin, bd=4, textvariable=pwd_str, show="*");
 pwd_entry.grid(row=1, column=1);
 
 #save login + password?
-save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
-                            onvalue=1, offvalue=0);
+save_credentials = Checkbutton(appWin, text='Save credentials',
+                               variable=save_input_user_password,
+                               onvalue=1, offvalue=0);
 save_credentials.grid(row=0, column=2 );
 
 
