@@ -21,6 +21,7 @@ appWin = Tk();
 
 save_input_user_password = IntVar();
 owner_comp_list = IntVar();
+repeat_current = IntVar();
 
 search_str = StringVar();
 user_str   = StringVar();
@@ -88,6 +89,7 @@ def process_playlist():
             state = player.get_state();
             if state not in playing:
                     break;
+
             if player_state == 'Stop':
                 player.stop();
                 return 0;
@@ -98,10 +100,12 @@ def process_playlist():
             elif player_state == 'Next':
                 break;
             elif player_state == 'Prev':
-                i -= 2;
+                if not repeat_current.get():
+                    i -= 2;
                 break;
             continue;
-        i += 1;
+        if not repeat_current.get():
+            i += 1;
     return 1;
 
 
@@ -176,6 +180,9 @@ def download():
     player_state = 'Download';
 
 
+wrap_around = Checkbutton(appWin, text='Repeat current', variable=repeat_current,
+                            onvalue=1, offvalue=0);
+wrap_around.pack(side=BOTTOM);
 
 save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
                             onvalue=1, offvalue=0);
