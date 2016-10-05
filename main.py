@@ -35,6 +35,7 @@ pwd_str    = StringVar();
 user     = '';
 password = '';
 player_state='Active';
+curplay_idx = 0;
 
 def download_song(song_data):
     urllib.request.urlretrieve(song_data['url'],
@@ -101,18 +102,18 @@ def get_credentials(in_user, in_pwd):
 
 def process_playlist():
     global music_list;
+    global curplay_idx;
     
     playlist = [ url['url'] for url in music_list]
     limit = len(music_list)
-    i = 0;
 
     vlc_inst = vlc.Instance();
     player = vlc_inst.media_player_new();
 
-    while (i < limit):
+    while (curplay_idx < limit):
         set_player_state('Active');
 
-        play_song(music_list[i], player, vlc_inst);
+        play_song(music_list[curplay_idx], player, vlc_inst);
 
         while True:
             player_state = get_player_state();
@@ -123,16 +124,27 @@ def process_playlist():
                 break;
             elif player_state == 'Prev':
                 if not repeat_current.get():
-                    i -= 2;
+                    curplay_idx -= 2;
+                break;
+            elif player_state == 'Changed':
                 break;
             continue;
         if not repeat_current.get():
-            i += 1;
+            curplay_idx += 1;
     return 1;
 
 
 PlayListBox = None;
 music_list = None;
+
+def play_selected(event):
+    global PlayListBox;
+    global curplay_idx;
+    set_player_state('Changed');
+    dbg('Key pressed');
+    curplay_idx = PlayListBox.curselection()[0] - 1;
+    set_player_state('Active');
+    return;
 
 def vk_music_main(a=None):
     global PlayListBox;
@@ -162,9 +174,9 @@ def vk_music_main(a=None):
     api = vk.API(session, access_token=access_token)
 
     if owner_comp_list.get():
-        music_response=api.audio.get(owner_id=my_id, count=15, access_token=access_token);
+        music_response=api.audio.get(owner_id=my_id, count=100, access_token=access_token);
     else:
-        music_response = api.audio.search(count=15, access_token=access_token, q=search_str.get());
+        music_response = api.audio.search(count=100, access_token=access_token, q=search_str.get());
 #music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
@@ -173,6 +185,7 @@ def vk_music_main(a=None):
         yscroll = Scrollbar(command=PlayListBox.yview, orient=VERTICAL);
         yscroll.grid(row = 5, column = 2);
         PlayListBox.configure(yscrollcommand=yscroll.set);
+        PlayListBox.bind('<ButtonRelease-1>', play_selected);
     PlayListBox.delete(0, PlayListBox.size());
 
     music_list = music_response[1:];
