@@ -1,2 +1,2 @@
 # pyplayer
-studying python-tk
+Program to play/download songs from VK social network
