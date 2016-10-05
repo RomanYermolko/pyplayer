@@ -180,7 +180,7 @@ def vk_music_main(a=None):
 #music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
-        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=80, height=25);
+        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=90, height=25);
         PlayListBox.grid(row=5, column=0,columnspan=5);
         yscroll = Scrollbar(command=PlayListBox.yview, orient=VERTICAL);
         yscroll.grid(row=5, column=5);
@@ -191,7 +191,7 @@ def vk_music_main(a=None):
     music_list = music_response[1:];
 
     for i in range(0, len(music_list)):
-        PlayListBox.insert(i + 1, 
+        PlayListBox.insert(i + 1, '[' + '{0: ^5}'.format(i) +'] ' + 
                 music_list[i]['artist'] + ' - ' + music_list[i]['title'] + '  ' + 
                 str(datetime.timedelta(seconds=music_list[i]['duration'])));
 
