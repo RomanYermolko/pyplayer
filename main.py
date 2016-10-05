@@ -18,6 +18,11 @@ from authorization import *
 from dbg import dbg
 
 appWin = Tk();
+appWin.title('VK pyplayer v0.0.1');
+
+# disable resizing by user
+appWin.resizable(width=False,height=False);
+appWin.minsize(width=200, height=600);
 
 save_input_user_password = IntVar();
 owner_comp_list = IntVar();
@@ -30,6 +35,43 @@ pwd_str    = StringVar();
 user     = '';
 password = '';
 player_state='Active';
+
+def play_song(song_data, player, vlc_inst):
+    try:
+        media = vlc_inst.media_new(song_data['url']);
+    except Exception as e:
+        dbg('Exception : ', e);
+        return -1;
+
+# debug template and reserve for future 
+#    dbg('Playing : ' + song_data['artist'] + '-' +
+#        song_data['duration'] + '   ' + str(song_data['duration'] / 60));
+
+    media.get_mrl();
+    player.set_media(media);
+
+    player.play();
+    playing = set([1,2,3,4]); #some strange shit. Just copied :)
+
+    time.sleep(1);
+ 
+    while True:
+        state = player.get_state();
+        if (state not in playing) or \
+           (get_player_state() != 'Active' and \
+            get_player_state() != 'Download'):
+               player.stop();
+               break;
+        continue;
+    return 0;
+
+def set_player_state(state):
+    global player_state;
+    player_state = state;
+
+def get_player_state():
+    global player_state;
+    return player_state;
 
 def get_credentials(in_user, in_pwd):
     #check default
@@ -50,12 +92,7 @@ def get_credentials(in_user, in_pwd):
     return in_user, in_pwd;
 
 def process_playlist():
-#downloading
-#for song in music_response[1:]:
-#    urllib.request.urlretrieve(song['url'], song['artist'] + '-' + song['title'] + '.mp3');
-    global PlayListBox;
     global music_list;
-    global player_state;
     
     playlist = [ url['url'] for url in music_list]
     limit = len(music_list)
@@ -65,38 +102,19 @@ def process_playlist():
     player = vlc_inst.media_player_new();
 
     while (i < limit):
-        player_state = 'Active';
-        PlayListBox.activate(i);
-        mp = playlist[i];
-        try:
-            media = vlc_inst.media_new(mp);
-        except Exception as e:
-            dbg('Exception : ', e);
-            i += 1;
-            continue;
+        set_player_state('Active');
 
-        dbg('Playing : ' + music_list[i]['artist'] + '-' +
-                music_list[i]['title'] + ' - ' + str(music_list[i]['duration'] / 60));
-        media.get_mrl();
-        player.set_media(media);
+        play_song(music_list[i], player, vlc_inst);
 
-        player.play();
-        playing = set([1,2,3,4]);
-
-        time.sleep(1);
-        
         while True:
-            state = player.get_state();
-            if state not in playing:
-                    break;
-
+            player_state = get_player_state();
             if player_state == 'Stop':
                 player.stop();
                 return 0;
             elif player_state == 'Download':
                 urllib.request.urlretrieve(mp, music_list[i]['artist'] + '-' +
                         music_list[i]['title'] + '.mp3');
-                player_state = 'Active';
+                set_player_state('Active');
             elif player_state == 'Next':
                 break;
             elif player_state == 'Prev':
@@ -146,7 +164,11 @@ def vk_music_main(a=None):
 #music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
-        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=60);
+        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=80);
+        PlayListBox.grid(row = 5, column = 1);
+        yscroll = Scrollbar(command=PlayListBox.yview, orient=VERTICAL);
+        yscroll.grid(row = 5, column = 2);
+        PlayListBox.configure(yscrollcommand=yscroll.set);
     PlayListBox.delete(0, PlayListBox.size());
 
     music_list = music_response[1:];
@@ -156,8 +178,6 @@ def vk_music_main(a=None):
                 music_list[i]['artist'] + ' - ' + music_list[i]['title'] + '  ' + 
                 str(datetime.timedelta(seconds=music_list[i]['duration'])));
 
-    PlayListBox.pack(side=BOTTOM);
-   # PlayListBox.after(1);
 
     Process = threading.Thread(target=process_playlist);
     Process.start();
@@ -182,42 +202,46 @@ def download():
 
 wrap_around = Checkbutton(appWin, text='Repeat current', variable=repeat_current,
                             onvalue=1, offvalue=0);
-wrap_around.pack(side=BOTTOM);
-
-save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
-                            onvalue=1, offvalue=0);
-save_credentials.pack(side=BOTTOM);
+wrap_around.grid(row = 4, column = 1);
 
 owner_compositions = Checkbutton(appWin, text='Owner compositions', variable=owner_comp_list,
                             onvalue=1, offvalue=0);
-owner_compositions.pack(side=BOTTOM);
+owner_compositions.grid(row = 4, column = 2);
 
+#login
 login_label = Label(appWin, text='User ');
-login_label.pack(side=LEFT);
+login_label.grid(row = 0, column = 0);
 login_entry = Entry(appWin, bd=4, textvariable=user_str);
-login_entry.pack(side=LEFT);
+login_entry.grid(row = 0, column = 1);
 
+#password
 pwd_label = Label(appWin, text='Password ');
-pwd_label.pack(side=LEFT);
+pwd_label.grid(row = 1, column = 0);
 pwd_entry = Entry(appWin, bd=4, textvariable=pwd_str, show="*");
-pwd_entry.pack(side=LEFT);
+pwd_entry.grid(row = 1, column = 1);
+
+#save login + password?
+save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
+                            onvalue=1, offvalue=0);
+save_credentials.grid(row = 0, column = 2 );
+
 
 search_label = Label(appWin, text='Search ');
-search_label.pack(side=LEFT);
+search_label.grid(row = 2, column = 0);
 search_entry = Entry(appWin, bd=4, textvariable=search_str);
-search_entry.pack(side=LEFT);
+search_entry.grid(row = 2, column = 1);
 
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
-stop_button = Button(appWin, command=stop, text='Stop'); 
-next_button = Button(appWin, command=pnext, text='Next');
-prev_button = Button(appWin, command=pprev, text='Prev'); 
+stop_button  = Button(appWin, command=stop, text='Stop'); 
+next_button  = Button(appWin, command=pnext, text='Next');
+prev_button  = Button(appWin, command=pprev, text='Prev'); 
 download_button = Button(appWin, command=download, text='Download'); 
 
-start_button.pack();
-stop_button.pack();
-next_button.pack();
-prev_button.pack();
-download_button.pack();
+start_button.grid(row = 3, column = 0);
+stop_button.grid(row = 3, column = 1);
+next_button.grid(row = 3, column = 2);
+prev_button.grid(row = 3, column = 3);
+download_button.grid(row = 4, column = 0);
 appWin.mainloop();
 
 
