@@ -22,7 +22,8 @@ appWin.title('VK pyplayer v0.0.1');
 
 # disable resizing by user
 appWin.resizable(width=False,height=False);
-appWin.minsize(width=200, height=550);
+appWin.minsize(width=550, height=200);
+appWin.maxsize(width=800, height=800);
 
 save_input_user_password = IntVar();
 owner_comp_list = IntVar();
@@ -31,6 +32,7 @@ repeat_current = IntVar();
 search_str = StringVar();
 user_str   = StringVar();
 pwd_str    = StringVar();
+playing_str = StringVar();
 
 user     = '';
 password = '';
@@ -44,7 +46,9 @@ def download_song(song_data):
     
 
 def play_song(song_data, player, vlc_inst):
+    global playing_str;
     try:
+        playing_str.set(song_data['artist'] + ' - ' + song_data['title']);
         media = vlc_inst.media_new(song_data['url']);
     except Exception as e:
         dbg('Exception : ', e);
@@ -243,6 +247,11 @@ search_label = Label(appWin, text='Search ');
 search_label.grid(row= 2, column=0);
 search_entry = Entry(appWin, bd=4, textvariable=search_str);
 search_entry.grid(row= 2, column=1);
+
+playing_label = Label(appWin, text='Now playing :');
+playing_label.grid(row=6, column=0);
+playing_entry = Entry(appWin, bd=4, textvariable=playing_str, width=80);
+playing_entry.grid(row=6, column=1, columnspan=4);
 
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
 stop_button  = Button(appWin, command=stop, text='Stop'); 
