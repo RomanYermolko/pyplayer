@@ -22,7 +22,7 @@ appWin.title('VK pyplayer v0.0.1');
 
 # disable resizing by user
 appWin.resizable(width=False,height=False);
-appWin.minsize(width=200, height=600);
+appWin.minsize(width=200, height=550);
 
 save_input_user_password = IntVar();
 owner_comp_list = IntVar();
@@ -174,16 +174,16 @@ def vk_music_main(a=None):
     api = vk.API(session, access_token=access_token)
 
     if owner_comp_list.get():
-        music_response=api.audio.get(owner_id=my_id, count=100, access_token=access_token);
+        music_response=api.audio.get(owner_id=my_id, count=1000, access_token=access_token);
     else:
-        music_response = api.audio.search(count=100, access_token=access_token, q=search_str.get());
+        music_response = api.audio.search(count=1000, access_token=access_token, q=search_str.get());
 #music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
-        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=80);
-        PlayListBox.grid(row = 5, column = 1);
+        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=80, height=25);
+        PlayListBox.grid(row=5, column=0,columnspan=5);
         yscroll = Scrollbar(command=PlayListBox.yview, orient=VERTICAL);
-        yscroll.grid(row = 5, column = 2);
+        yscroll.grid(row=5, column=5);
         PlayListBox.configure(yscrollcommand=yscroll.set);
         PlayListBox.bind('<Double-Button-1>', play_selected);
     PlayListBox.delete(0, PlayListBox.size());
@@ -215,34 +215,34 @@ def download():
 
 wrap_around = Checkbutton(appWin, text='Repeat current', variable=repeat_current,
                             onvalue=1, offvalue=0);
-wrap_around.grid(row = 4, column = 1);
+wrap_around.grid(row=4, column=1);
 
 owner_compositions = Checkbutton(appWin, text='Owner compositions', variable=owner_comp_list,
                             onvalue=1, offvalue=0);
-owner_compositions.grid(row = 4, column = 2);
+owner_compositions.grid(row=4, column=2);
 
 #login
 login_label = Label(appWin, text='User ');
-login_label.grid(row = 0, column = 0);
+login_label.grid(row=0, column=0);
 login_entry = Entry(appWin, bd=4, textvariable=user_str);
-login_entry.grid(row = 0, column = 1);
+login_entry.grid(row=0, column=1);
 
 #password
 pwd_label = Label(appWin, text='Password ');
-pwd_label.grid(row = 1, column = 0);
+pwd_label.grid(row=1, column=0);
 pwd_entry = Entry(appWin, bd=4, textvariable=pwd_str, show="*");
-pwd_entry.grid(row = 1, column = 1);
+pwd_entry.grid(row=1, column=1);
 
 #save login + password?
 save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
                             onvalue=1, offvalue=0);
-save_credentials.grid(row = 0, column = 2 );
+save_credentials.grid(row=0, column=2 );
 
 
 search_label = Label(appWin, text='Search ');
-search_label.grid(row = 2, column = 0);
+search_label.grid(row= 2, column=0);
 search_entry = Entry(appWin, bd=4, textvariable=search_str);
-search_entry.grid(row = 2, column = 1);
+search_entry.grid(row= 2, column=1);
 
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
 stop_button  = Button(appWin, command=stop, text='Stop'); 
@@ -250,11 +250,11 @@ next_button  = Button(appWin, command=pnext, text='Next');
 prev_button  = Button(appWin, command=pprev, text='Prev'); 
 download_button = Button(appWin, command=download, text='Download'); 
 
-start_button.grid(row = 3, column = 0);
-stop_button.grid(row = 3, column = 1);
-next_button.grid(row = 3, column = 2);
-prev_button.grid(row = 3, column = 3);
-download_button.grid(row = 4, column = 0);
+start_button.grid(row=3, column=0);
+stop_button.grid(row=3, column=1);
+prev_button.grid(row=3, column=2);
+next_button.grid(row=3, column=3);
+download_button.grid(row=4, column=0);
 appWin.mainloop();
 
 
