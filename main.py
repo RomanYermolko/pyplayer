@@ -36,6 +36,12 @@ user     = '';
 password = '';
 player_state='Active';
 
+def download_song(song_data):
+    urllib.request.urlretrieve(song_data['url'],
+            song_data['artist'] + '-' + song_data['title'] + '.mp3');
+    set_player_state('Active');
+    
+
 def play_song(song_data, player, vlc_inst):
     try:
         media = vlc_inst.media_new(song_data['url']);
@@ -62,6 +68,8 @@ def play_song(song_data, player, vlc_inst):
             get_player_state() != 'Download'):
                player.stop();
                break;
+        if get_player_state() == 'Download':
+            download_song(song_data);
         continue;
     return 0;
 
@@ -111,10 +119,6 @@ def process_playlist():
             if player_state == 'Stop':
                 player.stop();
                 return 0;
-            elif player_state == 'Download':
-                urllib.request.urlretrieve(mp, music_list[i]['artist'] + '-' +
-                        music_list[i]['title'] + '.mp3');
-                set_player_state('Active');
             elif player_state == 'Next':
                 break;
             elif player_state == 'Prev':
