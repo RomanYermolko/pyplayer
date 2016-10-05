@@ -9,6 +9,7 @@ import sys
 import termios
 import turtle
 import threading
+import datetime
 
 from tkinter import *
 
@@ -19,6 +20,7 @@ from dbg import dbg
 appWin = Tk();
 
 save_input_user_password = IntVar();
+owner_comp_list = IntVar();
 
 search_str = StringVar();
 user_str   = StringVar();
@@ -53,8 +55,7 @@ def process_playlist():
     global PlayListBox;
     global music_list;
     global player_state;
-
-    print('reached...');
+    
     playlist = [ url['url'] for url in music_list]
     limit = len(music_list)
     i = 0;
@@ -74,7 +75,7 @@ def process_playlist():
             continue;
 
         dbg('Playing : ' + music_list[i]['artist'] + '-' +
-                                        music_list[i]['title']);
+                music_list[i]['title'] + ' - ' + str(music_list[i]['duration'] / 60));
         media.get_mrl();
         player.set_media(media);
 
@@ -126,26 +127,30 @@ def vk_music_main(a=None):
         return 0;
 
     #get access_token to use VK API
-    access_token = get_token(user, password);
+    access_token, my_id = get_token(user, password);
     if access_token == 0:
         return 0;
+
 
     session = vk.Session()
     api = vk.API(session, access_token=access_token)
 
-#music_response=api.audio.get(owner_id=my_id, count=10, access_token=access_token);
-    music_response = api.audio.search(count=15, access_token=access_token, q=search_str.get());
+    if owner_comp_list.get():
+        music_response=api.audio.get(owner_id=my_id, count=15, access_token=access_token);
+    else:
+        music_response = api.audio.search(count=15, access_token=access_token, q=search_str.get());
 #music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
-        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=50);
+        PlayListBox = Listbox(appWin, selectmode=SINGLE, width=60);
     PlayListBox.delete(0, PlayListBox.size());
 
     music_list = music_response[1:];
 
     for i in range(0, len(music_list)):
         PlayListBox.insert(i + 1, 
-                music_list[i]['artist'] + ' - ' + music_list[i]['title']);
+                music_list[i]['artist'] + ' - ' + music_list[i]['title'] + '  ' + 
+                str(datetime.timedelta(seconds=music_list[i]['duration'])));
 
     PlayListBox.pack(side=BOTTOM);
    # PlayListBox.after(1);
@@ -175,6 +180,10 @@ def download():
 save_credentials = Checkbutton(appWin, text='Save credentials', variable=save_input_user_password,
                             onvalue=1, offvalue=0);
 save_credentials.pack(side=BOTTOM);
+
+owner_compositions = Checkbutton(appWin, text='Owner compositions', variable=owner_comp_list,
+                            onvalue=1, offvalue=0);
+owner_compositions.pack(side=BOTTOM);
 
 login_label = Label(appWin, text='User ');
 login_label.pack(side=LEFT);
