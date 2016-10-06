@@ -38,7 +38,6 @@ playing_str = StringVar();
 
 user     = '';
 password = '';
-player_state = ACTIVE;
 curplay_idx = 0;
 
 def download_song(song_data):
@@ -74,14 +73,6 @@ def play_song(song_data, player, vlc_inst):
             download_song(song_data);
         continue;
     return 0;
-
-def set_player_state(state):
-    global player_state;
-    player_state = state;
-
-def get_player_state():
-    global player_state;
-    return player_state;
 
 def get_credentials(in_user, in_pwd):
     #check default
@@ -155,15 +146,14 @@ def play_selected(event):
 
 def vk_music_main(a=None):
     global PlayListBox;
-    global player_state;
     global music_list;
     global curplay_idx;
     curplay_idx = 0;
 
-    if player_state == ACTIVE:
-        player_state = STOP;
+    if get_player_state() == ACTIVE:
+        set_player_state(STOP);
         time.sleep(1);
-    player_state=ACTIVE; 
+    set_player_state(ACTIVE); 
     #get Credentials window
     user = user_str.get();
     password = pwd_str.get();
