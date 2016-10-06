@@ -15,7 +15,9 @@ from tkinter import *
 
 #internal files
 from authorization import *
+from player_states import *
 from dbg import dbg
+
 
 appWin = Tk();
 appWin.title('VK pyplayer v0.0.1');
@@ -36,13 +38,13 @@ playing_str = StringVar();
 
 user     = '';
 password = '';
-player_state='Active';
+player_state = ACTIVE;
 curplay_idx = 0;
 
 def download_song(song_data):
     urllib.request.urlretrieve(song_data['url'],
             song_data['artist'] + '-' + song_data['title'] + '.mp3');
-    set_player_state('Active');
+    set_player_state(ACTIVE);
     
 
 def play_song(song_data, player, vlc_inst):
@@ -65,11 +67,10 @@ def play_song(song_data, player, vlc_inst):
     while True:
         state = player.get_state();
         if (state not in playing) or \
-           (get_player_state() != 'Active' and \
-            get_player_state() != 'Download'):
+           (get_player_state() not in ACTIVE_STATES):
                player.stop();
                break;
-        if get_player_state() == 'Download':
+        if get_player_state() == DOWNLOAD:
             download_song(song_data);
         continue;
     return 0;
@@ -111,28 +112,34 @@ def process_playlist():
     player = vlc_inst.media_player_new();
 
     while (curplay_idx < limit):
-        set_player_state('Active');
+        set_player_state(ACTIVE);
 
         play_song(music_list[curplay_idx], player, vlc_inst);
 
         while True:
             player_state = get_player_state();
-            if player_state == 'Stop':
+            if player_state == STOP:
                 player.stop();
                 return 0;
-            elif player_state == 'Next':
+            elif player_state == PLAY:
+                set_player_state(ACTIVE);
+                player.play();
+                continue;
+            elif player_state == PAUSE:
+                player.pause();
+                continue;
+            elif player_state == NEXT:
                 break;
-            elif player_state == 'Prev':
+            elif player_state == PREV:
                 if not repeat_current.get():
                     curplay_idx -= 2;
                 break;
-            elif player_state == 'Changed':
+            elif player_state == CHANGED:
                 break;
             continue;
         if not repeat_current.get():
             curplay_idx += 1;
     return 1;
-
 
 PlayListBox = None;
 music_list = None;
@@ -140,21 +147,23 @@ music_list = None;
 def play_selected(event):
     global PlayListBox;
     global curplay_idx;
-    set_player_state('Changed');
+    set_player_state(CHANGED);
     time.sleep(0.5);
     curplay_idx = PlayListBox.curselection()[0] - 1;
-    set_player_state('Active');
+    set_player_state(ACTIVE);
     return;
 
 def vk_music_main(a=None):
     global PlayListBox;
     global player_state;
     global music_list;
+    global curplay_idx;
+    curplay_idx = 0;
 
-    if player_state == 'Active':
-        player_state = 'Stop';
+    if player_state == ACTIVE:
+        player_state = STOP;
         time.sleep(1);
-    player_state='Active'; 
+    player_state=ACTIVE; 
     #get Credentials window
     user = user_str.get();
     password = pwd_str.get();
@@ -201,17 +210,22 @@ def vk_music_main(a=None):
 
 
 def stop():
-    set_player_state('Stop');
+    set_player_state(STOP);
 
 def pnext():
-    set_player_state('Next');
+    set_player_state(NEXT);
 
 def pprev():
-    set_player_state('Prev');
+    set_player_state(PREV);
 
 def download():
-    set_player_state('Download');
+    set_player_state(DOWNLOAD);
 
+def pause():
+    set_player_state(PAUSE);
+
+def play():
+    set_player_state(PLAY);
 ###############################################################################
 ############ UI related data #########################
 ###############################################################################
@@ -259,15 +273,19 @@ playing_entry = Entry(appWin, bd=4, textvariable=playing_str, width=80);
 playing_entry.grid(row=6, column=1, columnspan=4);
 
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
-stop_button  = Button(appWin, command=stop, text='Stop'); 
+stop_button  = Button(appWin, command=stop, text='Stop');
+play_button = Button(appWin, command=play, text='Play');
+pause_button = Button(appWin, command=pause, text='Pause');
 next_button  = Button(appWin, command=pnext, text='Next');
-prev_button  = Button(appWin, command=pprev, text='Prev'); 
+prev_button  = Button(appWin, command=pprev, text='Prev');
 download_button = Button(appWin, command=download, text='Download'); 
 
 start_button.grid(row=3, column=0);
 stop_button.grid(row=3, column=1);
-prev_button.grid(row=3, column=2);
-next_button.grid(row=3, column=3);
+play_button.grid(row=3, column=2);
+pause_button.grid(row=3, column=3);
+prev_button.grid(row=3, column=4);
+next_button.grid(row=3, column=5);
 download_button.grid(row=4, column=0);
 appWin.mainloop();
 
