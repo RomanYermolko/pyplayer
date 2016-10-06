@@ -198,31 +198,35 @@ def vk_music_main(a=None):
     Process = threading.Thread(target=process_playlist);
     Process.start();
 
-
-def stop():
-    set_player_state(STOP);
-
-def pnext():
-    set_player_state(NEXT);
-
-def pprev():
-    set_player_state(PREV);
-
-def download():
-    set_player_state(DOWNLOAD);
-
-def pause():
-    set_player_state(PAUSE);
-
-def play():
-    set_player_state(PLAY);
 ###############################################################################
 ############ UI related data #########################
 ###############################################################################
+ 
+def player_stop():
+    set_player_state(STOP);
+
+def player_next():
+    set_player_state(NEXT);
+
+def player_prev():
+    set_player_state(PREV);
+
+def player_download():
+    set_player_state(DOWNLOAD);
+
+def player_pause():
+    set_player_state(PAUSE);
+
+def player_play():
+    set_player_state(PLAY);
+
+# set background picture
 bg_pic = PhotoImage(file='pictures/music_wall_gif.gif');
 bg_label = Label(appWin, image=bg_pic);
 bg_label.place(x=0, y=0, relwidth=1, relheight=1);
 
+
+# Check buttons for Repeat and Owner..
 wrap_around = Checkbutton(appWin, text='Repeat current', 
                           variable=repeat_current,
                           onvalue=1, offvalue=0);
@@ -233,43 +237,47 @@ owner_compositions = Checkbutton(appWin, text='Owner compositions',
                                  onvalue=1, offvalue=0);
 owner_compositions.grid(row=4, column=2);
 
-#login
+# login
 login_label = Label(appWin, text='User ');
 login_label.grid(row=0, column=0);
 login_entry = Entry(appWin, bd=4, textvariable=user_str);
 login_entry.grid(row=0, column=1);
 
-#password
+# password
 pwd_label = Label(appWin, text='Password ');
 pwd_label.grid(row=1, column=0);
 pwd_entry = Entry(appWin, bd=4, textvariable=pwd_str, show="*");
 pwd_entry.grid(row=1, column=1);
 
-#save login + password?
+# save login + password?
 save_credentials = Checkbutton(appWin, text='Save credentials',
                                variable=save_input_user_password,
                                onvalue=1, offvalue=0);
 save_credentials.grid(row=0, column=2 );
 
 
+# Search
 search_label = Label(appWin, text='Search ');
 search_label.grid(row= 2, column=0);
 search_entry = Entry(appWin, bd=4, textvariable=search_str);
 search_entry.grid(row= 2, column=1);
 
+# Now playing data
 playing_label = Label(appWin, text='Now playing :');
 playing_label.grid(row=6, column=0);
 playing_entry = Entry(appWin, bd=4, textvariable=playing_str, width=80);
 playing_entry.grid(row=6, column=1, columnspan=4);
 
+# Buttons creation
 start_button = Button(appWin, command=vk_music_main, text='Start'); 
-stop_button  = Button(appWin, command=stop, text='Stop');
-play_button = Button(appWin, command=play, text='Play');
-pause_button = Button(appWin, command=pause, text='Pause');
-next_button  = Button(appWin, command=pnext, text='Next');
-prev_button  = Button(appWin, command=pprev, text='Prev');
-download_button = Button(appWin, command=download, text='Download'); 
+stop_button  = Button(appWin, command=player_stop, text='Stop');
+play_button = Button(appWin, command=player_play, text='Play');
+pause_button = Button(appWin, command=player_pause, text='Pause');
+next_button  = Button(appWin, command=player_next, text='Next');
+prev_button  = Button(appWin, command=player_prev, text='Prev');
+download_button = Button(appWin, command=player_download, text='Download'); 
 
+# Buttons location
 start_button.grid(row=3, column=0);
 stop_button.grid(row=3, column=1);
 play_button.grid(row=3, column=2);
@@ -277,6 +285,8 @@ pause_button.grid(row=3, column=3);
 prev_button.grid(row=3, column=4);
 next_button.grid(row=3, column=5);
 download_button.grid(row=4, column=0);
+
+# Tkinter mainloop :)
 appWin.mainloop();
 
 
