@@ -41,8 +41,10 @@ password = '';
 curplay_idx = 0;
 
 def download_song(song_data):
-    urllib.request.urlretrieve(song_data['url'],
-            song_data['artist'] + '-' + song_data['title'] + '.mp3');
+    try:
+        urllib.request.urlretrieve(song_data['url'],
+                song_data['artist'] + '-' + song_data['title'] + '.mp3');
+    except: pass;
     set_player_state(ACTIVE);
     
 
@@ -176,7 +178,6 @@ def vk_music_main(a=None):
         music_response=api.audio.get(owner_id=my_id, count=1000, access_token=access_token);
     else:
         music_response = api.audio.search(count=1000, access_token=access_token, q=search_str.get());
-#music_response = api.audio.getCount(owner_id=26529194, count=2, access_token=access_token);
      
     if not PlayListBox:
         PlayListBox = Listbox(appWin, selectmode=SINGLE, width=90, height=25);
