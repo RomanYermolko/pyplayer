@@ -170,7 +170,7 @@ def vk_music_main(a=None):
 
     user, password = get_credentials(user, password);
     if not user or not password:
-        print("No credentials. Good buy!");
+        dbg("No credentials. Good buy!");
         return 0;
 
     #get access_token to use VK API
